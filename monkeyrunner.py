@@ -55,7 +55,7 @@ def exit_handler(signum, frame):
     print 'Exiting...'
     try:
         subprocess.call(
-            "adb shell kill -9 $(adb shell ps | grep monkey | awk '{print $2}')",
+            "adb -s %s shell kill -9 $(adb -s %s shell ps | grep monkey | awk '{print $2}')" % (deviceId, deviceId),
             shell=True)
     except Exception, e:
         print e
