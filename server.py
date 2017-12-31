@@ -127,7 +127,7 @@ def calculate_distance(image, template, scale):
 
 def calculate_time(distance, image, scale):
     """Map distance to time in ms."""
-    return int(1.01 * distance / scale)
+    return int(1.0 * distance / scale * 1440 / piece_template_screen_width)
 
 
 @app.route('/', methods=['POST'])
