@@ -7,7 +7,7 @@ import cv2 as cv
 import numpy as np
 from flask import Flask, request, abort
 
-TOP_KEEPOUT_PX = 400
+TOP_KEEPOUT_PX = 705
 
 save_results = False
 piece_template = None
