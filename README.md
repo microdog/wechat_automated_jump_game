@@ -1,6 +1,6 @@
 # 自动玩微信跳一跳小游戏
 
-利用MonkeyRunner和OpenCV在安卓或iOS设备上自动玩微信跳一跳小游戏。
+利用MonkeyRunner（WebDriverAgent）和OpenCV在安卓（iOS）设备上自动玩微信跳一跳小游戏。
 
 效果：http://t.cn/RH939gQ
 
