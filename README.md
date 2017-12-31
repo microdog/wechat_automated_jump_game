@@ -5,7 +5,8 @@
 ## 依赖
 
 * OpenCV
-  * Mac下使用
+  * 安装方法：https://docs.opencv.org/3.4.0/da/df6/tutorial_py_table_of_contents_setup.html
+  * Mac下Homebrew可以直接 `brew install opencv` ，然后按提示进行配置即可。
 * numpy
   * 使用 `pip` 安装：`pip install numpy`
 * flask
@@ -56,3 +57,11 @@
 ### 安卓手机需要ROOT吗？
 
 不需要ROOT。但需要电脑安装 [Android SDK](https://developer.android.com/studio/index.html#downloads)。只需要命令行工具即可，不需要`Android Studio`。
+
+### 提示 `Broken Pipe` 该如何处理？
+
+`Ctrl + C`退出一次MonkeyRunner再重新启动即可。
+
+### MonkeyRunner提示 `Press enter to start` 后卡住
+
+下载[2.5.4rc1版本的Jython](http://search.maven.org/remotecontent?filepath=org/python/jython-standalone/2.5.4-rc1/jython-standalone-2.5.4-rc1.jar)并 ***替换*** Android SDK 中 `tools/lib/jython-standalone-2.5.3.jar` 文件。
