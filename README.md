@@ -58,7 +58,7 @@
 
 ## 已知问题
 
-* iOS下WDA截图有损，杂噪点可能会影响位置判断，但应该不致命。
+* iOS下WDA截图有损，杂噪点可能会影响位置判断，但应该不致命。有解决方法，见QA。
 * iOS下可能需要微调长按时间的修正系数（wda.py文件中的 `CORRECTION_RATIO` 变量）。
 * 距离到时间的映射大概也许可能是有问题的（calculate_time函数）。必要的话可以自己微调里面的系数，或者干脆重写这个函数。
 * 圆形和长方形的棋盘位置判断可能会有偏差，但不致命。
@@ -92,3 +92,7 @@
 ### 可以多个设备同时操作吗？
 
 可以，开一个服务端和多个MonkeyRunner即可。
+
+### iOS上运行时定位不准或服务端有大量 `Ignored shape` 提示
+
+是WDA默认截图为有损格式所致。可以自行修改代码 [WebDriverAgentLib/Categories/XCUIDevice+FBHelpers.m](https://github.com/mykola-mokhnach/WebDriverAgent/blob/6a9b497/WebDriverAgentLib/Categories/XCUIDevice+FBHelpers.m#L64) 中 `- (NSData *)fb_screenshotWithError:(NSError*__autoreleasing*)error` 函数里 `quality` 变量值为 `0` 。但可能会导致不稳定，原因见该变量注释。
