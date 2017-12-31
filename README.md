@@ -37,7 +37,7 @@
 1. 安卓手机开启USB调试，通过USB线连接到电脑。
 1. 使用ADB列出连接的安卓设备：`adb devices`，并记录设备ID如 `WTKDU1670700000`。
 1. 启动MonkeyRunner：`monkeyrunner monkeyrunner.py WTKDU1670700000 http://127.0.0.1:5000`。注意将 `WTKDU1670700000` 替换为上一步记录的设备ID，如果启动服务端时修改了监听端口，则第二个参数也需要对应修改。
-1. MonkeyRunner提示 `Press enter to start` 后，在微信中打开跳一跳并开始游戏，然后在MonkeyRunner中按下回车键。
+1. MonkeyRunner提示 `Press enter to start` 后，在微信中打开跳一跳并开始游戏，然后在MonkeyRunner中按下回车键。
 
 ## 已知问题
 
