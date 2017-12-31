@@ -2,6 +2,8 @@
 
 利用MonkeyRunner和OpenCV在安卓设备上自动玩微信跳一跳小游戏。
 
+效果：http://t.cn/RH939gQ
+
 ## 依赖
 
 * OpenCV
