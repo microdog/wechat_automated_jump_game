@@ -66,3 +66,11 @@
 ### MonkeyRunner提示 `Press enter to start` 后卡住
 
 下载[2.5.4rc1版本的Jython](http://search.maven.org/remotecontent?filepath=org/python/jython-standalone/2.5.4-rc1/jython-standalone-2.5.4-rc1.jar)并 ***替换*** Android SDK 中 `tools/lib/jython-standalone-2.5.3.jar` 文件。
+
+### 会不会被封号？
+
+这个……封号应该是不会的，并没有对微信做任何的hack。不过删榜倒是有可能的。另外刷分太多会没朋友喔。
+
+### 可以多个设备同时操作吗？
+
+可以，开一个服务端和多个MonkeyRunner即可。
