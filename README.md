@@ -1,6 +1,6 @@
 # 自动玩微信跳一跳小游戏
 
-利用MonkeyRunner和OpenCV在安卓设备上自动玩微信跳一跳小游戏。
+利用MonkeyRunner和OpenCV在安卓或iOS设备上自动玩微信跳一跳小游戏。
 
 效果：http://t.cn/RH939gQ
 
@@ -17,6 +17,11 @@
   * 位于 Android SDK 中：`tools/bin/monkeyrunner`
 * adb
   * 位于 Android SDK 中：`platform-tools/adb`
+* requests
+  * 仅当使用WebDriverAgent在iOS上运行时需要安装
+  * 使用 `pip` 安装：`pip install requests`
+* WebDriverAgent
+  * https://github.com/facebook/WebDriverAgent
 
 ## 原理说明
 
@@ -36,21 +41,32 @@
 
 ## 操作步骤
 
+### 安卓
+
 1. 启动计算跳跃时间的服务端：`python server.py`，服务端默认监听 `127.0.0.1:5000`。可选启动参数见 `python server.py -h`。
 1. 安卓手机开启USB调试，通过USB线连接到电脑。
 1. 使用ADB列出连接的安卓设备：`adb devices`，并记录设备ID如 `WTKDU1670700000`。
 1. 启动MonkeyRunner：`monkeyrunner monkeyrunner.py WTKDU1670700000 http://127.0.0.1:5000`。注意将 `WTKDU1670700000` 替换为上一步记录的设备ID，如果启动服务端时修改了监听端口，则第二个参数也需要对应修改。
 1. MonkeyRunner提示 `Press enter to start` 后，在微信中打开跳一跳并开始游戏，然后在MonkeyRunner中按下回车键。
 
+### iOS
+
+1. 启动计算跳跃时间的服务端：`python server.py`，服务端默认监听 `127.0.0.1:5000`。可选启动参数见 `python server.py -h`。
+1. 在手机上启动 `WebDriverAgentRunner`，并记录设备URL如 `http://10.0.0.100:8100` 。
+1. 启动脚本：`python wda.py http://10.0.0.100:8100 http://127.0.0.1:5000`。注意将 `http://10.0.0.100:8100` 替换为上一步记录的设备ID，如果启动服务端时修改了监听端口，则第二个参数也需要对应修改。
+1. 提示 `Press enter to start` 后，在微信中打开跳一跳并开始游戏，然后在脚本中按下回车键。
+
 ## 已知问题
 
+* iOS下WDA截图有损，杂噪点可能会影响位置判断，但应该不致命。
+* iOS下可能需要微调长按时间的修正系数（wda.py文件中的 `CORRECTION_RATIO` 变量）。
 * 距离到时间的映射大概也许可能是有问题的（calculate_time函数）。必要的话可以自己微调里面的系数，或者干脆重写这个函数。
 * 圆形和长方形的棋盘位置判断可能会有偏差，但不致命。
 * 音乐盒的音符可能会干扰棋盘位置判断，致命。（已尝试修复，未确认）
 
 ## TODO
 
-* 增加iOS脚本？
+* ~~增加iOS脚本？~~
 * 也许可以把服务端部署在服务器上。
 * 优化性能。
 * 优化圆形和长方形棋盘的处理。

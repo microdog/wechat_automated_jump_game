@@ -79,7 +79,7 @@ def find_shape_points(image, piece_loc, sx, sy, scale):
 
 def find_board_center(image, piece_loc, scale):
     """Find target board's center location (x, y)."""
-    image = cv.Canny(image, 10, 20)  # Edge detection
+    image = cv.Canny(image, 50, 100)  # Edge detection
     w = image.shape[1]
 
     # Prevent the piece from being detected
