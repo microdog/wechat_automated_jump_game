@@ -1,25 +1,33 @@
 # 自动玩微信跳一跳小游戏
 
-利用MonkeyRunner（WebDriverAgent）和OpenCV在安卓（iOS）设备上自动玩微信跳一跳小游戏。
+利用MonkeyRunner（WebDriverAgent）和OpenCV在Android（iOS）设备上自动玩微信跳一跳小游戏。
 
 效果：http://t.cn/RH939gQ
 
 ## 依赖
 
+### 运行服务端
+
+* Python
+  * 版本 >= 2.7 或 >= 3.4
 * OpenCV
   * 安装方法：https://docs.opencv.org/3.4.0/da/df6/tutorial_py_table_of_contents_setup.html
-  * Mac下Homebrew可以直接 `brew install opencv` ，然后按提示进行配置即可。
-* numpy
-  * 使用 `pip` 安装：`pip install numpy`
-* flask
-  * 使用 `pip` 安装：`pip install flask`
+  * Mac下Homebrew可以直接 `brew install opencv` ，然后按提示进行配置即可
+* 其它依赖
+  * 使用 `pip` 安装：`pip install -U -r requirements_server.txt`
+
+### 控制Android设备
+
 * monkeyrunner
   * 位于 Android SDK 中：`tools/bin/monkeyrunner`
 * adb
   * 位于 Android SDK 中：`platform-tools/adb`
+
+### 控制iOS设备
+
 * requests
   * 仅当使用WebDriverAgent在iOS上运行时需要安装
-  * 使用 `pip` 安装：`pip install requests`
+  * 使用 `pip` 安装：`pip install -U -r requirements_wda.txt`
 * WebDriverAgent
   * https://github.com/facebook/WebDriverAgent
 
@@ -35,17 +43,17 @@
 
 ## 项目结构说明
 
-项目主要分为两部分：计算跳跃时间的服务端（`server.py`）和执行设备控制操作的客户端（目前仅有安卓MonkeyRunner脚本`monkeyrunner.py`）。
+项目主要分为两部分：计算跳跃时间的服务端（`server.py`）和执行设备控制操作的客户端，分为控制Android设备的MonkeyRunner脚本（`monkeyrunner.py`）和控制iOS设备的WDA脚本（`wda.py`）。
 
 执行设备控制操作的客户端首先对设备进行截图，然后将截图通过POST方式发送到服务端的HTTP接口上，计算跳跃时间的服务端对截图进行处理并返回对应的按压时间，客户端在设备上模拟点击操作。
 
 ## 操作步骤
 
-### 安卓
+### Android
 
 1. 启动计算跳跃时间的服务端：`python server.py`，服务端默认监听 `127.0.0.1:5000`。可选启动参数见 `python server.py -h`。
-1. 安卓手机开启USB调试，通过USB线连接到电脑。
-1. 使用ADB列出连接的安卓设备：`adb devices`，并记录设备ID如 `WTKDU1670700000`。
+1. Android手机开启USB调试，通过USB线连接到电脑。
+1. 使用ADB列出连接的Android设备：`adb devices`，并记录设备ID如 `WTKDU1670700000`。
 1. 启动MonkeyRunner：`monkeyrunner monkeyrunner.py WTKDU1670700000 http://127.0.0.1:5000`。注意将 `WTKDU1670700000` 替换为上一步记录的设备ID，如果启动服务端时修改了监听端口，则第二个参数也需要对应修改。
 1. MonkeyRunner提示 `Press enter to start` 后，在微信中打开跳一跳并开始游戏，然后在MonkeyRunner中按下回车键。
 
@@ -55,6 +63,18 @@
 1. 在手机上启动 `WebDriverAgentRunner`，并记录设备URL如 `http://10.0.0.100:8100` 。
 1. 启动脚本：`python wda.py http://10.0.0.100:8100 http://127.0.0.1:5000`。注意将 `http://10.0.0.100:8100` 替换为上一步记录的设备ID，如果启动服务端时修改了监听端口，则第二个参数也需要对应修改。
 1. 提示 `Press enter to start` 后，在微信中打开跳一跳并开始游戏，然后在脚本中按下回车键。
+
+## 幺蛾子
+
+本项目做了以下幺蛾子操作。
+
+### 人工增加随机跳跃误差
+
+`monkeyrunner.py` 和 `wda.py` 均接受 `--jitter JITTER` 参数，若设置该值，则会将控制设备按压的时间乘以 `[1 - JITTER, 1 + JITTER]` 区间内的随机值。可以先尝试 `0.01` 然后再根据效果调整。
+
+### 随机跳跃间隔
+
+两次跳跃间的等待时间为固定 `1.75s` 加 `0.5s` 内的随机值。
 
 ## 已知问题
 
@@ -67,13 +87,14 @@
 ## TODO
 
 * ~~增加iOS脚本？~~
-* 也许可以把服务端部署在服务器上。
-* 优化性能。
+* ~~也许可以把服务端部署在服务器上。~~
+* ~~优化性能。~~
+* 进一步优化性能。
 * 优化圆形和长方形棋盘的处理。
 
-## QA
+## FAQ
 
-### 安卓手机需要ROOT吗？
+### Android手机需要ROOT吗？
 
 不需要ROOT。但需要电脑安装 [Android SDK](https://developer.android.com/studio/index.html#downloads)。只需要命令行工具即可，不需要`Android Studio`。
 
