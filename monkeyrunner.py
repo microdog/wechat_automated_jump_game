@@ -68,18 +68,19 @@ def parse_args():
             print error
             print ''
 
-        print 'usage: monkeyrunner monkeyrunner.py [-h] [--jitter JITTER_FLOAT]'
-        print '                                    DEVICE_ID REMOTE_URL'
-        print ''
-        print 'arguments:'
-        print '  DEVICE_ID     target device id'
-        print '  REMOTE_URL    remote server url'
-        print ''
-        print 'optional arguments:'
-        print '  -h, --help    show this help message and exit'
-        print '  --jitter JITTER_FLOAT'
-        print '                press time will be multiplied by a random value'
-        print '                in range [1 - JITTER_FLOAT, 1 + JITTER_FLOAT]'
+        print """\
+usage: monkeyrunner monkeyrunner.py [-h] [--jitter JITTER_FLOAT]
+                                    DEVICE_ID REMOTE_URL
+
+arguments:
+  DEVICE_ID     target device id
+  REMOTE_URL    remote server url
+
+optional arguments:
+  -h, --help    show this help message and exit
+  --jitter JITTER_FLOAT
+                if set, press time will be multiplied by a random
+                value in range [1 - JITTER_FLOAT, 1 + JITTER_FLOAT]"""
 
         sys.exit(1 if error is not None else 0)
 
