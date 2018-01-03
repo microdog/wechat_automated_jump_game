@@ -26,7 +26,6 @@
 ### 控制iOS设备
 
 * requests
-  * 仅当使用WebDriverAgent在iOS上运行时需要安装
   * 使用 `pip` 安装：`pip install -U -r requirements_wda.txt`
 * WebDriverAgent
   * https://github.com/facebook/WebDriverAgent
@@ -87,7 +86,7 @@
 ## TODO
 
 * ~~增加iOS脚本？~~
-* ~~也许可以把服务端部署在服务器上。~~
+* ~~也许可以把服务端部署在服务器上。~~ 见FAQ。
 * ~~优化性能。~~
 * 进一步优化性能。
 * 优化圆形和长方形棋盘的处理。
@@ -117,3 +116,9 @@
 ### iOS上运行时定位不准或服务端有大量 `Ignored shape` 提示
 
 是WDA默认截图为有损格式所致。可以自行修改代码 [WebDriverAgentLib/Categories/XCUIDevice+FBHelpers.m](https://github.com/mykola-mokhnach/WebDriverAgent/blob/6a9b497/WebDriverAgentLib/Categories/XCUIDevice+FBHelpers.m#L64) 中 `- (NSData *)fb_screenshotWithError:(NSError*__autoreleasing*)error` 函数里 `quality` 变量值为 `0` 。但可能会导致不稳定，原因见该变量注释。
+
+### 服务端支持WSGI么？
+
+支持，使用 `server.py` 中的 `app` 变量即可。配置可在 `server_config.py` 中修改。
+
+比如用 `gunicorn` 跑：`gunicorn -w 4 -k gevent server:app` 。 ***NOT PRODUCTION READY!***
