@@ -88,7 +88,7 @@ if __name__ == '__main__':
         type=float,
         default=None,
         help='if set, press time will be multiplied by a random '
-        'value in range [1 - JITTER_FLOAT, 1 + JITTER_FLOAT]')
+        'value in range [1 - JITTER, 1 + JITTER]')
     parser.add_argument(
         'wda_url', type=str, help='server url of WebDriverAgent')
     parser.add_argument('remote_url', type=str, help='remote server url')
