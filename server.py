@@ -3,20 +3,21 @@ import random
 import logging
 
 from flask import Flask, request, abort
-from solver import JumpGameSolver
+from solver import JumpGameSolver, SolverInputException
 
 app = Flask(__name__)
 app.config.from_object('server_config')
 
-solver = None
+solver = None  # type: JumpGameSolver
 
 
 @app.route('/', methods=['POST'], strict_slashes=False)
 def handler():
     try:
         press_time = solver.solve_from_stream(request.stream)
-    except ValueError as e:
+    except SolverInputException as e:
         abort(400, e.message)
+        return
 
     if press_time is None:
         abort(400, 'jump target not found in image')
@@ -25,6 +26,7 @@ def handler():
         jitter = request.args.get('jitter', None, float)
     except ValueError:
         abort(400, 'invalid jitter value')
+        return
 
     if jitter is not None:
         app.logger.debug('Applying jitter: %s', jitter)
