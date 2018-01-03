@@ -1,11 +1,18 @@
 import collections
-import threading
 import logging
-import time
 import os
+import threading
+import time
 
 import cv2 as cv
 import numpy as np
+
+try:
+    import solver_cython as c
+except ImportError:
+    import solver_python as c
+
+logger = logging.getLogger('JumpGameSolver')
 
 
 class LRUCache(object):
@@ -36,11 +43,17 @@ class LRUCache(object):
                 self._cache.popitem(last=False)
 
 
+class SolverException(Exception):
+    pass
+
+
+class SolverInputException(SolverException):
+    pass
+
+
 class JumpGameSolver(object):
     TOP_KEEP_OUT_PX = 705
     BLUR_SIZE = (4, 4)
-
-    logger = logging.getLogger('JumpGameSolver')
 
     def __init__(self, **kwargs):
         self.piece_template = None
@@ -60,97 +73,22 @@ class JumpGameSolver(object):
 
     def find_piece(self, image, template, scale):
         """Find piece's center location (x, y)."""
-        image = cv.blur(image, self.BLUR_SIZE)
-        # Template alread blurred in get_piece_template()
-        # template = cv.blur(template, (4, 4))
-
-        res = cv.matchTemplate(image, template, cv.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-
-        self.logger.debug('Max value in piece matching: %s', max_val)
-
-        if max_val < 0.6:
-            return None
-
-        return (max_loc[0] + int(50 * scale), max_loc[1] + int(161 * scale))
-
-    def find_shape_points(self, image, piece_loc, sx, sy, scale):
-        """Find a shape's top-center and right-most points ((x, y), (x, y))."""
-        start_point = [0, sy]
-
-        # Find start point
-        h, w = image.shape[:2]
-        for x in range(sx, w):
-            if image[sy, x]:
-                start_point[0] = x
-            else:
-                break
-
-        end_point = list(start_point)
-        start_point[0] = (start_point[0] + sx) / 2
-
-        # Find end point
-        vp = 0  # Vertical pixels
-        for y in range(sy + 1, piece_loc[1]):
-            new_x = end_point[0]
-            for x in range(new_x, w):
-                if image[y, x] and (x + 1 == w or not image[y, x + 1]):
-                    new_x = x
-                    break
-            if new_x == end_point[0]:  # Vertical pixel
-                vp += 1
-                if vp >= 4:
-                    break
-            elif new_x < end_point[0]:  # Corner
-                break
-            else:
-                vp = 0
-                end_point[0] = new_x
-                end_point[1] = y
-
-        # Try to ignore musical note
-        if end_point[1] - start_point[1] < int(20 * scale):
-            self.logger.info('Ignored shape: %s', (start_point, end_point))
-            return None
-
-        return (start_point, end_point)
+        return c.find_piece(image, template, scale, self.BLUR_SIZE, logger)
 
     def find_board_center(self, image, piece_loc, scale):
         """Find target board's center location (x, y)."""
-        image = cv.Canny(image, 50, 100)  # Edge detection
-        w = image.shape[1]
-
-        # Prevent the piece from being detected
-        x_keepout = range(
-            max(0, piece_loc[0] - int(50 * scale)),
-            min(piece_loc[0] + int(51 * scale), w))
-
-        shape_points = None
-        for y in range(int(self.TOP_KEEP_OUT_PX * scale), piece_loc[1]):
-            for x in range(w):
-                if image[y, x] and x not in x_keepout:
-                    shape_points = self.find_shape_points(
-                        image, piece_loc, x, y, scale)
-                    if shape_points:
-                        break
-            if shape_points:
-                break
-
-        if not shape_points:
-            return None
-
-        return (shape_points[0][0], shape_points[1][1])
+        return c.find_board_center(image, piece_loc, scale, self.TOP_KEEP_OUT_PX, logger)
 
     def calculate_distance(self, image, template, scale):
         """Calculate distance."""
         piece_loc = self.find_piece(image, template, scale)
-        self.logger.debug('Piece location: %s', piece_loc)
+        logger.debug('Piece location: %s', piece_loc)
 
         if not piece_loc:
             return None
 
         board_center = self.find_board_center(image, piece_loc, scale)
-        self.logger.debug('Board center location: %s', board_center)
+        logger.debug('Board center location: %s', board_center)
 
         if not board_center:
             return None
@@ -165,13 +103,12 @@ class JumpGameSolver(object):
 
     def calculate_time(self, distance, image, scale):
         """Map distance to time in ms."""
-        return int(
-            1.0 * distance / scale * 1440 / self.piece_template_screen_width)
+        return int(1.0 * distance / scale * 1440 / self.piece_template_screen_width)
 
     def get_piece_template(self, scale):
         template = self.piece_template_cache.get(scale)
         if template is None:
-            self.logger.debug('Creating resized template: %s', scale)
+            logger.debug('Creating resized template: %s', scale)
             template = cv.resize(
                 self.piece_template, (0, 0),
                 fx=scale,
@@ -180,7 +117,7 @@ class JumpGameSolver(object):
             template = cv.blur(template, self.BLUR_SIZE)
             self.piece_template_cache.set(scale, template)
         else:
-            self.logger.debug('Cached template used: %s', scale)
+            logger.debug('Cached template used: %s', scale)
         return template
 
     def solve_image(self, image):
@@ -190,27 +127,27 @@ class JumpGameSolver(object):
 
         distance = self.calculate_distance(image, template, scale)
         if distance is None:
+            logger.debug('Jump target not found in image')
             return None
-            self.logger.debug('Jump target not found in image')
-        self.logger.debug('Distance: %s', distance)
+        logger.debug('Distance: %s', distance)
 
         press_time = self.calculate_time(distance, image, scale)
-        self.logger.debug('Press time: %s', press_time)
+        logger.debug('Press time: %s', press_time)
 
         return press_time
 
     def solve_from_stream(self, stream):
         buf = np.fromstring(stream.read(), np.uint8)
         if not buf.size:
-            raise ValueError('missing image data')
+            raise SolverInputException('missing image data')
 
         image = cv.imdecode(buf, cv.IMREAD_COLOR)
         if image is None:
-            raise ValueError('invalid image data')
+            raise SolverInputException('invalid image data')
 
         del buf
 
         return self.solve_image(image)
 
 
-__all__ = ['JumpGameSolver']
+__all__ = ['JumpGameSolver', 'SolverException', 'SolverInputException']

@@ -48,17 +48,25 @@
 
 ## 操作步骤
 
-### Android
+### Step 1 - 构建服务端C拓展（可选）
 
-1. 启动计算跳跃时间的服务端：`python server.py`，服务端默认监听 `127.0.0.1:5000`。可选启动参数见 `python server.py -h`。
+在项目根目录下运行 `python setup.py build_ext --inplace` 即可。该步骤可选，不执行该步骤则关键步骤使用纯Python实现，执行该步骤则使用Cython实现。
+
+### Step 2 - 启动服务端
+
+在项目根目录下运行 `python server.py` 即可。服务端默认监听 `127.0.0.1:5000`。可选启动参数见 `python server.py -h`。
+
+### Step 3 - 启动设备控制脚本
+
+#### Android
+
 1. Android手机开启USB调试，通过USB线连接到电脑。
 1. 使用ADB列出连接的Android设备：`adb devices`，并记录设备ID如 `WTKDU1670700000`。
 1. 启动MonkeyRunner：`monkeyrunner monkeyrunner.py WTKDU1670700000 http://127.0.0.1:5000`。注意将 `WTKDU1670700000` 替换为上一步记录的设备ID，如果启动服务端时修改了监听端口，则第二个参数也需要对应修改。
 1. MonkeyRunner提示 `Press enter to start` 后，在微信中打开跳一跳并开始游戏，然后在MonkeyRunner中按下回车键。
 
-### iOS
+#### iOS
 
-1. 启动计算跳跃时间的服务端：`python server.py`，服务端默认监听 `127.0.0.1:5000`。可选启动参数见 `python server.py -h`。
 1. 在手机上启动 `WebDriverAgentRunner`，并记录设备URL如 `http://10.0.0.100:8100` 。
 1. 启动脚本：`python wda.py http://10.0.0.100:8100 http://127.0.0.1:5000`。注意将 `http://10.0.0.100:8100` 替换为上一步记录的设备ID，如果启动服务端时修改了监听端口，则第二个参数也需要对应修改。
 1. 提示 `Press enter to start` 后，在微信中打开跳一跳并开始游戏，然后在脚本中按下回车键。
