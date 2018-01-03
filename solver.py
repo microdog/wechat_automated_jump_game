@@ -7,7 +7,10 @@ import time
 import cv2 as cv
 import numpy as np
 
-import solver_cython as c
+try:
+    import solver_cython as c
+except ImportError:
+    import solver_python as c
 
 logger = logging.getLogger('JumpGameSolver')
 
