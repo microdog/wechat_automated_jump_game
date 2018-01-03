@@ -33,19 +33,21 @@ def main(device):
             res = urllib2.urlopen(req)
         except urllib2.HTTPError:
             break
-        sleep = float(res.read()) / 1000.0
+        press_time = float(res.read()) / 1000.0
         res.close()
 
-        print 'Long press: %ss' % sleep
+        print 'Long press: %ss' % press_time
 
         start = (random.randint(400, 600), random.randint(400, 600))
         end = (random.randint(400, 600), random.randint(400, 600))
 
         print 'Will drag from %s to %s' % (start, end)
 
-        device.drag(start, end, sleep, 2)
+        device.drag(start, end, press_time, 2)
 
-        MonkeyRunner.sleep(1.75)
+        sleep = 1.75 + 0.75 * random.random()
+        print('Sleep %ss' % (sleep,))
+        MonkeyRunner.sleep(sleep)
 
 
 def exit_handler(signum, frame):

@@ -55,27 +55,30 @@ def main():
         except requests.exceptions.RequestException:
             break
 
-        sleep = float(res.content) / 1000.0 * CORRECTION_RATIO
+        press_time_raw = float(res.content) / 1000.0
+        press_time = press_time_raw * CORRECTION_RATIO
         res.close()
 
-        print('Long press: %ss' % sleep)
+        print('Long press: {}s (raw: {}s)'.format(press_time, press_time_raw))
 
         x, y = random.randint(400, 500), random.randint(400, 500)
 
-        print('Will tap at (%s, %s)' % (x, y))
+        print('Will tap at {}'.format((x, y)))
 
         http.post(
             server_url + '/session/' + session_id + '/wda/touchAndHold',
             data=json.dumps({
                 'x': x,
                 'y': y,
-                'duration': sleep
+                'duration': press_time
             }),
             headers={
                 'Content-Type': 'application/json'
             })
 
-        time.sleep(1.75)
+        sleep = 1.75 + 0.75 * random.random()
+        print('Sleep {}s'.format(sleep))
+        time.sleep(sleep)
 
 
 if __name__ == '__main__':
