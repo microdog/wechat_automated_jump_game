@@ -67,11 +67,12 @@ cdef tuple find_shape_points(np.ndarray[DTYPE_t, ndim=2] image, tuple piece_loc,
     return start_point, end_point
 
 cpdef tuple find_board_center(np.ndarray[DTYPE_t, ndim=3] input_image,
-                              tuple piece_loc, double scale, int top_keep_out,
+                              tuple piece_loc, double scale, double top_keep_out_ratio,
                               object logger):
     # Edge detection
     cdef np.ndarray[DTYPE_t, ndim=2] image = cv.Canny(input_image, 50, 100)
     cdef int w = image.shape[1]
+    cdef int h = image.shape[0]
 
     # Prevent the piece from being detected
     cdef int x_keepout_l = max(0, piece_loc[0] - int(50 * scale))
@@ -79,7 +80,7 @@ cpdef tuple find_board_center(np.ndarray[DTYPE_t, ndim=3] input_image,
 
     cdef int x, y
     shape_points = None
-    for y in range(int(top_keep_out * scale), piece_loc[1]):
+    for y in range(int(top_keep_out_ratio * h), piece_loc[1]):
         for x in range(w):
             if image[y, x] and (x < x_keepout_l or x > x_keepout_r):
                 shape_points = find_shape_points(image, piece_loc, x, y, scale, logger)

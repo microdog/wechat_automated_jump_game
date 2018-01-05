@@ -1606,7 +1606,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, cha
 /* Module declarations from 'solver_cython' */
 static PyObject *__pyx_f_13solver_cython_find_piece(PyArrayObject *, PyArrayObject *, double, PyObject *, PyObject *, int __pyx_skip_dispatch); /*proto*/
 static PyObject *__pyx_f_13solver_cython_find_shape_points(PyArrayObject *, PyObject *, int, int, double, PyObject *); /*proto*/
-static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *, PyObject *, double, int, PyObject *, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *, PyObject *, double, double, PyObject *, int __pyx_skip_dispatch); /*proto*/
 static CYTHON_INLINE PyObject *__Pyx_carray_to_py_int(int *, Py_ssize_t); /*proto*/
 static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_int(int *, Py_ssize_t); /*proto*/
 static int __Pyx_carray_from_py_int(PyObject *, int *, Py_ssize_t); /*proto*/
@@ -1652,12 +1652,12 @@ static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_ImportError[] = "ImportError";
 static const char __pyx_k_input_image[] = "input_image";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
-static const char __pyx_k_top_keep_out[] = "top_keep_out";
 static const char __pyx_k_OverflowError[] = "OverflowError";
 static const char __pyx_k_matchTemplate[] = "matchTemplate";
 static const char __pyx_k_Ignored_shape_s[] = "Ignored shape: %s";
 static const char __pyx_k_TM_CCOEFF_NORMED[] = "TM_CCOEFF_NORMED";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_top_keep_out_ratio[] = "top_keep_out_ratio";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
 static const char __pyx_k_Max_value_in_piece_matching_s[] = "Max value in piece matching: %s";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
@@ -1707,11 +1707,11 @@ static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_scale;
 static PyObject *__pyx_n_s_template;
 static PyObject *__pyx_n_s_test;
-static PyObject *__pyx_n_s_top_keep_out;
+static PyObject *__pyx_n_s_top_keep_out_ratio;
 static PyObject *__pyx_n_s_uint8;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_pf_13solver_cython_find_piece(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_image, PyArrayObject *__pyx_v_template, double __pyx_v_scale, PyObject *__pyx_v_blur_size, PyObject *__pyx_v_logger); /* proto */
-static PyObject *__pyx_pf_13solver_cython_2find_board_center(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_input_image, PyObject *__pyx_v_piece_loc, double __pyx_v_scale, int __pyx_v_top_keep_out, PyObject *__pyx_v_logger); /* proto */
+static PyObject *__pyx_pf_13solver_cython_2find_board_center(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_input_image, PyObject *__pyx_v_piece_loc, double __pyx_v_scale, double __pyx_v_top_keep_out_ratio, PyObject *__pyx_v_logger); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static PyObject *__pyx_float_0_6;
@@ -2971,14 +2971,15 @@ static PyObject *__pyx_f_13solver_cython_find_shape_points(PyArrayObject *__pyx_
  *     return start_point, end_point
  * 
  * cpdef tuple find_board_center(np.ndarray[DTYPE_t, ndim=3] input_image,             # <<<<<<<<<<<<<<
- *                               tuple piece_loc, double scale, int top_keep_out,
+ *                               tuple piece_loc, double scale, double top_keep_out_ratio,
  *                               object logger):
  */
 
 static PyObject *__pyx_pw_13solver_cython_3find_board_center(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_v_input_image, PyObject *__pyx_v_piece_loc, double __pyx_v_scale, int __pyx_v_top_keep_out, PyObject *__pyx_v_logger, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_v_input_image, PyObject *__pyx_v_piece_loc, double __pyx_v_scale, double __pyx_v_top_keep_out_ratio, PyObject *__pyx_v_logger, CYTHON_UNUSED int __pyx_skip_dispatch) {
   PyArrayObject *__pyx_v_image = 0;
   int __pyx_v_w;
+  int __pyx_v_h;
   int __pyx_v_x_keepout_l;
   int __pyx_v_x_keepout_r;
   int __pyx_v_x;
@@ -3024,7 +3025,7 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
  *     # Edge detection
  *     cdef np.ndarray[DTYPE_t, ndim=2] image = cv.Canny(input_image, 50, 100)             # <<<<<<<<<<<<<<
  *     cdef int w = image.shape[1]
- * 
+ *     cdef int h = image.shape[0]
  */
   __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_cv); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -3097,12 +3098,21 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
  *     # Edge detection
  *     cdef np.ndarray[DTYPE_t, ndim=2] image = cv.Canny(input_image, 50, 100)
  *     cdef int w = image.shape[1]             # <<<<<<<<<<<<<<
+ *     cdef int h = image.shape[0]
  * 
- *     # Prevent the piece from being detected
  */
   __pyx_v_w = (__pyx_v_image->dimensions[1]);
 
-  /* "solver_cython.pyx":77
+  /* "solver_cython.pyx":75
+ *     cdef np.ndarray[DTYPE_t, ndim=2] image = cv.Canny(input_image, 50, 100)
+ *     cdef int w = image.shape[1]
+ *     cdef int h = image.shape[0]             # <<<<<<<<<<<<<<
+ * 
+ *     # Prevent the piece from being detected
+ */
+  __pyx_v_h = (__pyx_v_image->dimensions[0]);
+
+  /* "solver_cython.pyx":78
  * 
  *     # Prevent the piece from being detected
  *     cdef int x_keepout_l = max(0, piece_loc[0] - int(50 * scale))             # <<<<<<<<<<<<<<
@@ -3111,38 +3121,38 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
  */
   if (unlikely(__pyx_v_piece_loc == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 77, __pyx_L1_error)
+    __PYX_ERR(0, 78, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v_piece_loc, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v_piece_loc, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyInt_FromDouble((50.0 * __pyx_v_scale)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_FromDouble((50.0 * __pyx_v_scale)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = PyNumber_Subtract(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Subtract(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_7 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_5, __pyx_t_1, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_5, __pyx_t_1, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_8) {
     __Pyx_INCREF(__pyx_t_5);
     __pyx_t_3 = __pyx_t_5;
   } else {
-    __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_3 = __pyx_t_2;
     __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_x_keepout_l = __pyx_t_4;
 
-  /* "solver_cython.pyx":78
+  /* "solver_cython.pyx":79
  *     # Prevent the piece from being detected
  *     cdef int x_keepout_l = max(0, piece_loc[0] - int(50 * scale))
  *     cdef int x_keepout_r = min(piece_loc[0] + int(51 * scale), w)             # <<<<<<<<<<<<<<
@@ -3152,24 +3162,24 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
   __pyx_t_4 = __pyx_v_w;
   if (unlikely(__pyx_v_piece_loc == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 78, __pyx_L1_error)
+    __PYX_ERR(0, 79, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_piece_loc, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_piece_loc, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyInt_FromDouble((51.0 * __pyx_v_scale)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_FromDouble((51.0 * __pyx_v_scale)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_8) {
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_5 = __pyx_t_1;
     __pyx_t_1 = 0;
@@ -3178,41 +3188,41 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
     __pyx_t_5 = __pyx_t_2;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_x_keepout_r = __pyx_t_4;
 
-  /* "solver_cython.pyx":81
+  /* "solver_cython.pyx":82
  * 
  *     cdef int x, y
  *     shape_points = None             # <<<<<<<<<<<<<<
- *     for y in range(int(top_keep_out * scale), piece_loc[1]):
+ *     for y in range(int(top_keep_out_ratio * h), piece_loc[1]):
  *         for x in range(w):
  */
   __Pyx_INCREF(Py_None);
   __pyx_v_shape_points = Py_None;
 
-  /* "solver_cython.pyx":82
+  /* "solver_cython.pyx":83
  *     cdef int x, y
  *     shape_points = None
- *     for y in range(int(top_keep_out * scale), piece_loc[1]):             # <<<<<<<<<<<<<<
+ *     for y in range(int(top_keep_out_ratio * h), piece_loc[1]):             # <<<<<<<<<<<<<<
  *         for x in range(w):
  *             if image[y, x] and (x < x_keepout_l or x > x_keepout_r):
  */
   if (unlikely(__pyx_v_piece_loc == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 82, __pyx_L1_error)
+    __PYX_ERR(0, 83, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_GetItemInt_Tuple(__pyx_v_piece_loc, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_GetItemInt_Tuple(__pyx_v_piece_loc, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_7 = __Pyx_PyInt_As_long(__pyx_t_5); if (unlikely((__pyx_t_7 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_As_long(__pyx_t_5); if (unlikely((__pyx_t_7 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  for (__pyx_t_4 = ((long)(__pyx_v_top_keep_out * __pyx_v_scale)); __pyx_t_4 < __pyx_t_7; __pyx_t_4+=1) {
+  for (__pyx_t_4 = ((long)(__pyx_v_top_keep_out_ratio * __pyx_v_h)); __pyx_t_4 < __pyx_t_7; __pyx_t_4+=1) {
     __pyx_v_y = __pyx_t_4;
 
-    /* "solver_cython.pyx":83
+    /* "solver_cython.pyx":84
  *     shape_points = None
- *     for y in range(int(top_keep_out * scale), piece_loc[1]):
+ *     for y in range(int(top_keep_out_ratio * h), piece_loc[1]):
  *         for x in range(w):             # <<<<<<<<<<<<<<
  *             if image[y, x] and (x < x_keepout_l or x > x_keepout_r):
  *                 shape_points = find_shape_points(image, piece_loc, x, y, scale, logger)
@@ -3221,8 +3231,8 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
     for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
       __pyx_v_x = __pyx_t_10;
 
-      /* "solver_cython.pyx":84
- *     for y in range(int(top_keep_out * scale), piece_loc[1]):
+      /* "solver_cython.pyx":85
+ *     for y in range(int(top_keep_out_ratio * h), piece_loc[1]):
  *         for x in range(w):
  *             if image[y, x] and (x < x_keepout_l or x > x_keepout_r):             # <<<<<<<<<<<<<<
  *                 shape_points = find_shape_points(image, piece_loc, x, y, scale, logger)
@@ -3241,7 +3251,7 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
       } else if (unlikely(__pyx_t_12 >= __pyx_pybuffernd_image.diminfo[1].shape)) __pyx_t_13 = 1;
       if (unlikely(__pyx_t_13 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_13);
-        __PYX_ERR(0, 84, __pyx_L1_error)
+        __PYX_ERR(0, 85, __pyx_L1_error)
       }
       __pyx_t_14 = ((*__Pyx_BufPtrStrided2d(__pyx_t_13solver_cython_DTYPE_t *, __pyx_pybuffernd_image.rcbuffer->pybuffer.buf, __pyx_t_11, __pyx_pybuffernd_image.diminfo[0].strides, __pyx_t_12, __pyx_pybuffernd_image.diminfo[1].strides)) != 0);
       if (__pyx_t_14) {
@@ -3260,29 +3270,29 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
       __pyx_L8_bool_binop_done:;
       if (__pyx_t_8) {
 
-        /* "solver_cython.pyx":85
+        /* "solver_cython.pyx":86
  *         for x in range(w):
  *             if image[y, x] and (x < x_keepout_l or x > x_keepout_r):
  *                 shape_points = find_shape_points(image, piece_loc, x, y, scale, logger)             # <<<<<<<<<<<<<<
  *                 if shape_points:
  *                     break
  */
-        __pyx_t_5 = __pyx_f_13solver_cython_find_shape_points(((PyArrayObject *)__pyx_v_image), __pyx_v_piece_loc, __pyx_v_x, __pyx_v_y, __pyx_v_scale, __pyx_v_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 85, __pyx_L1_error)
+        __pyx_t_5 = __pyx_f_13solver_cython_find_shape_points(((PyArrayObject *)__pyx_v_image), __pyx_v_piece_loc, __pyx_v_x, __pyx_v_y, __pyx_v_scale, __pyx_v_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 86, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF_SET(__pyx_v_shape_points, __pyx_t_5);
         __pyx_t_5 = 0;
 
-        /* "solver_cython.pyx":86
+        /* "solver_cython.pyx":87
  *             if image[y, x] and (x < x_keepout_l or x > x_keepout_r):
  *                 shape_points = find_shape_points(image, piece_loc, x, y, scale, logger)
  *                 if shape_points:             # <<<<<<<<<<<<<<
  *                     break
  *         if shape_points:
  */
-        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_shape_points); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 86, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_shape_points); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 87, __pyx_L1_error)
         if (__pyx_t_8) {
 
-          /* "solver_cython.pyx":87
+          /* "solver_cython.pyx":88
  *                 shape_points = find_shape_points(image, piece_loc, x, y, scale, logger)
  *                 if shape_points:
  *                     break             # <<<<<<<<<<<<<<
@@ -3291,7 +3301,7 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
  */
           goto __pyx_L6_break;
 
-          /* "solver_cython.pyx":86
+          /* "solver_cython.pyx":87
  *             if image[y, x] and (x < x_keepout_l or x > x_keepout_r):
  *                 shape_points = find_shape_points(image, piece_loc, x, y, scale, logger)
  *                 if shape_points:             # <<<<<<<<<<<<<<
@@ -3300,8 +3310,8 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
  */
         }
 
-        /* "solver_cython.pyx":84
- *     for y in range(int(top_keep_out * scale), piece_loc[1]):
+        /* "solver_cython.pyx":85
+ *     for y in range(int(top_keep_out_ratio * h), piece_loc[1]):
  *         for x in range(w):
  *             if image[y, x] and (x < x_keepout_l or x > x_keepout_r):             # <<<<<<<<<<<<<<
  *                 shape_points = find_shape_points(image, piece_loc, x, y, scale, logger)
@@ -3311,17 +3321,17 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
     }
     __pyx_L6_break:;
 
-    /* "solver_cython.pyx":88
+    /* "solver_cython.pyx":89
  *                 if shape_points:
  *                     break
  *         if shape_points:             # <<<<<<<<<<<<<<
  *             break
  * 
  */
-    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_shape_points); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 88, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_shape_points); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 89, __pyx_L1_error)
     if (__pyx_t_8) {
 
-      /* "solver_cython.pyx":89
+      /* "solver_cython.pyx":90
  *                     break
  *         if shape_points:
  *             break             # <<<<<<<<<<<<<<
@@ -3330,7 +3340,7 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
  */
       goto __pyx_L4_break;
 
-      /* "solver_cython.pyx":88
+      /* "solver_cython.pyx":89
  *                 if shape_points:
  *                     break
  *         if shape_points:             # <<<<<<<<<<<<<<
@@ -3341,18 +3351,18 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
   }
   __pyx_L4_break:;
 
-  /* "solver_cython.pyx":91
+  /* "solver_cython.pyx":92
  *             break
  * 
  *     if not shape_points:             # <<<<<<<<<<<<<<
  *         return None
  * 
  */
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_shape_points); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_shape_points); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 92, __pyx_L1_error)
   __pyx_t_14 = ((!__pyx_t_8) != 0);
   if (__pyx_t_14) {
 
-    /* "solver_cython.pyx":92
+    /* "solver_cython.pyx":93
  * 
  *     if not shape_points:
  *         return None             # <<<<<<<<<<<<<<
@@ -3364,7 +3374,7 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
     __pyx_r = ((PyObject*)Py_None);
     goto __pyx_L0;
 
-    /* "solver_cython.pyx":91
+    /* "solver_cython.pyx":92
  *             break
  * 
  *     if not shape_points:             # <<<<<<<<<<<<<<
@@ -3373,23 +3383,23 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
  */
   }
 
-  /* "solver_cython.pyx":94
+  /* "solver_cython.pyx":95
  *         return None
  * 
  *     return shape_points[0][0], shape_points[1][1]             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_shape_points, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_shape_points, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_shape_points, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_shape_points, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2);
@@ -3405,7 +3415,7 @@ static PyObject *__pyx_f_13solver_cython_find_board_center(PyArrayObject *__pyx_
  *     return start_point, end_point
  * 
  * cpdef tuple find_board_center(np.ndarray[DTYPE_t, ndim=3] input_image,             # <<<<<<<<<<<<<<
- *                               tuple piece_loc, double scale, int top_keep_out,
+ *                               tuple piece_loc, double scale, double top_keep_out_ratio,
  *                               object logger):
  */
 
@@ -3442,13 +3452,13 @@ static PyObject *__pyx_pw_13solver_cython_3find_board_center(PyObject *__pyx_sel
   PyArrayObject *__pyx_v_input_image = 0;
   PyObject *__pyx_v_piece_loc = 0;
   double __pyx_v_scale;
-  int __pyx_v_top_keep_out;
+  double __pyx_v_top_keep_out_ratio;
   PyObject *__pyx_v_logger = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("find_board_center (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_input_image,&__pyx_n_s_piece_loc,&__pyx_n_s_scale,&__pyx_n_s_top_keep_out,&__pyx_n_s_logger,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_input_image,&__pyx_n_s_piece_loc,&__pyx_n_s_scale,&__pyx_n_s_top_keep_out_ratio,&__pyx_n_s_logger,0};
     PyObject* values[5] = {0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -3486,7 +3496,7 @@ static PyObject *__pyx_pw_13solver_cython_3find_board_center(PyObject *__pyx_sel
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_top_keep_out)) != 0)) kw_args--;
+        if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_top_keep_out_ratio)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("find_board_center", 1, 5, 5, 3); __PYX_ERR(0, 69, __pyx_L3_error)
         }
@@ -3512,7 +3522,7 @@ static PyObject *__pyx_pw_13solver_cython_3find_board_center(PyObject *__pyx_sel
     __pyx_v_input_image = ((PyArrayObject *)values[0]);
     __pyx_v_piece_loc = ((PyObject*)values[1]);
     __pyx_v_scale = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_scale == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 70, __pyx_L3_error)
-    __pyx_v_top_keep_out = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_top_keep_out == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 70, __pyx_L3_error)
+    __pyx_v_top_keep_out_ratio = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_top_keep_out_ratio == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 70, __pyx_L3_error)
     __pyx_v_logger = values[4];
   }
   goto __pyx_L4_argument_unpacking_done;
@@ -3525,7 +3535,7 @@ static PyObject *__pyx_pw_13solver_cython_3find_board_center(PyObject *__pyx_sel
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_input_image), __pyx_ptype_5numpy_ndarray, 1, "input_image", 0))) __PYX_ERR(0, 69, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_piece_loc), (&PyTuple_Type), 1, "piece_loc", 1))) __PYX_ERR(0, 70, __pyx_L1_error)
-  __pyx_r = __pyx_pf_13solver_cython_2find_board_center(__pyx_self, __pyx_v_input_image, __pyx_v_piece_loc, __pyx_v_scale, __pyx_v_top_keep_out, __pyx_v_logger);
+  __pyx_r = __pyx_pf_13solver_cython_2find_board_center(__pyx_self, __pyx_v_input_image, __pyx_v_piece_loc, __pyx_v_scale, __pyx_v_top_keep_out_ratio, __pyx_v_logger);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3536,7 +3546,7 @@ static PyObject *__pyx_pw_13solver_cython_3find_board_center(PyObject *__pyx_sel
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13solver_cython_2find_board_center(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_input_image, PyObject *__pyx_v_piece_loc, double __pyx_v_scale, int __pyx_v_top_keep_out, PyObject *__pyx_v_logger) {
+static PyObject *__pyx_pf_13solver_cython_2find_board_center(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_input_image, PyObject *__pyx_v_piece_loc, double __pyx_v_scale, double __pyx_v_top_keep_out_ratio, PyObject *__pyx_v_logger) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_input_image;
   __Pyx_Buffer __pyx_pybuffer_input_image;
   PyObject *__pyx_r = NULL;
@@ -3553,7 +3563,7 @@ static PyObject *__pyx_pf_13solver_cython_2find_board_center(CYTHON_UNUSED PyObj
   }
   __pyx_pybuffernd_input_image.diminfo[0].strides = __pyx_pybuffernd_input_image.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_input_image.diminfo[0].shape = __pyx_pybuffernd_input_image.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_input_image.diminfo[1].strides = __pyx_pybuffernd_input_image.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_input_image.diminfo[1].shape = __pyx_pybuffernd_input_image.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_input_image.diminfo[2].strides = __pyx_pybuffernd_input_image.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_input_image.diminfo[2].shape = __pyx_pybuffernd_input_image.rcbuffer->pybuffer.shape[2];
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_13solver_cython_find_board_center(__pyx_v_input_image, __pyx_v_piece_loc, __pyx_v_scale, __pyx_v_top_keep_out, __pyx_v_logger, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_13solver_cython_find_board_center(__pyx_v_input_image, __pyx_v_piece_loc, __pyx_v_scale, __pyx_v_top_keep_out_ratio, __pyx_v_logger, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6774,7 +6784,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_scale, __pyx_k_scale, sizeof(__pyx_k_scale), 0, 0, 1, 1},
   {&__pyx_n_s_template, __pyx_k_template, sizeof(__pyx_k_template), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
-  {&__pyx_n_s_top_keep_out, __pyx_k_top_keep_out, sizeof(__pyx_k_top_keep_out), 0, 0, 1, 1},
+  {&__pyx_n_s_top_keep_out_ratio, __pyx_k_top_keep_out_ratio, sizeof(__pyx_k_top_keep_out_ratio), 0, 0, 1, 1},
   {&__pyx_n_s_uint8, __pyx_k_uint8, sizeof(__pyx_k_uint8), 0, 0, 1, 1},
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
   {0, 0, 0, 0, 0, 0, 0}
@@ -8942,29 +8952,7 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 #endif
 
 
-      /* CIntFromPyVerify */
-      #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
-#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
-#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
-    {\
-        func_type value = func_value;\
-        if (sizeof(target_type) < sizeof(func_type)) {\
-            if (unlikely(value != (func_type) (target_type) value)) {\
-                func_type zero = 0;\
-                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
-                    return (target_type) -1;\
-                if (is_unsigned && unlikely(value < zero))\
-                    goto raise_neg_overflow;\
-                else\
-                    goto raise_overflow;\
-            }\
-        }\
-        return (target_type) value;\
-    }
-
-/* CIntToPy */
+      /* CIntToPy */
       static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
     const long neg_one = (long) -1, const_zero = (long) 0;
     const int is_unsigned = neg_one > const_zero;
@@ -9025,6 +9013,28 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
                                      little, !is_unsigned);
     }
 }
+
+/* CIntFromPyVerify */
+      #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
+#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
+#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
+    {\
+        func_type value = func_value;\
+        if (sizeof(target_type) < sizeof(func_type)) {\
+            if (unlikely(value != (func_type) (target_type) value)) {\
+                func_type zero = 0;\
+                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
+                    return (target_type) -1;\
+                if (is_unsigned && unlikely(value < zero))\
+                    goto raise_neg_overflow;\
+                else\
+                    goto raise_overflow;\
+            }\
+        }\
+        return (target_type) value;\
+    }
 
 /* CIntToPy */
       static CYTHON_INLINE PyObject* __Pyx_PyInt_From_npy_uint8(npy_uint8 value) {

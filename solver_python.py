@@ -60,17 +60,17 @@ def find_shape_points(image, piece_loc, sx, sy, scale, logger):
     return start_point, end_point
 
 
-def find_board_center(image, piece_loc, scale, top_keep_out, logger):
+def find_board_center(image, piece_loc, scale, top_keep_out_ratio, logger):
     """Find target board's center location (x, y)."""
     image = cv.Canny(image, 50, 100)  # Edge detection
-    w = image.shape[1]
+    h, w = image.shape[:2]
 
     # Prevent the piece from being detected
     x_keepout_l = max(0, piece_loc[0] - int(50 * scale))
     x_keepout_r = min(piece_loc[0] + int(51 * scale), w)
 
     shape_points = None
-    for y in range(int(top_keep_out * scale), piece_loc[1]):
+    for y in range(int(top_keep_out_ratio * h), piece_loc[1]):
         for x in range(w):
             if image[y, x] and (x < x_keepout_l or x > x_keepout_r):
                 shape_points = find_shape_points(

@@ -52,7 +52,7 @@ class SolverInputException(SolverException):
 
 
 class JumpGameSolver(object):
-    TOP_KEEP_OUT_PX = 705
+    TOP_KEEP_OUT_RATIO = 0.3
     BLUR_SIZE = (4, 4)
 
     def __init__(self, **kwargs):
@@ -77,7 +77,7 @@ class JumpGameSolver(object):
 
     def find_board_center(self, image, piece_loc, scale):
         """Find target board's center location (x, y)."""
-        return c.find_board_center(image, piece_loc, scale, self.TOP_KEEP_OUT_PX, logger)
+        return c.find_board_center(image, piece_loc, scale, self.TOP_KEEP_OUT_RATIO, logger)
 
     def calculate_distance(self, image, template, scale):
         """Calculate distance."""
